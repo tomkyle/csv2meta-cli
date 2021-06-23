@@ -5,9 +5,10 @@
 
 Clone the repo somewhere. You may want to add a symlink to your `~/bin` directory:
 
-````bash
+```bash
 $ ln -s path/to/csv2meta/bin/csv2meta csv2meta
 ```
+
 
 ## Interesting reads
 
@@ -27,10 +28,3 @@ http://www.metadataworkinggroup.org/
   https://exiv2.org/
 - **ExifTool**
   https://github.com/exiftool/exiftool
-
-
-
-
-
-
-
