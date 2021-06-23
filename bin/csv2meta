@@ -1,0 +1,153 @@
+#!/usr/bin/env bash
+
+
+
+
+# ---------------------------------------
+# Runtime Environment
+# ---------------------------------------
+
+set -o errexit
+set -o nounset
+set -o pipefail
+# set -o xtrace
+
+
+# --------------------------------------
+# Output and formatting stuff
+# --------------------------------------
+
+readonly C_BLUE='\033[1;34m'
+readonly NC='\033[0m' # No Color
+
+function e_info {
+  echo -e "${C_BLUE}${*}${NC}"
+}
+
+
+
+# --------------------------------------
+# Requirements
+# --------------------------------------
+
+function require  {
+	command -v $1 >/dev/null 2>&1 || exit_err "${1} required but it's not installed";
+}
+
+# Requirements
+require exiftool
+
+
+
+
+# --------------------------------------
+# Settings
+# --------------------------------------
+
+META_ID_FIELD="iptc:ObjectName"
+META_TITLE_FIELD="iptc:Headline"
+META_DESCRIPTION_FIELD="mwg:Description"
+META_KEYWORDS_FIELD="mwg:Keywords"
+
+
+# --------------------------------------
+# Functions
+# --------------------------------------
+
+
+function processCsv {
+	CSV_FILE="${1}"
+
+	[ ! -f $CSV_FILE ] && { echo "${CSV_FILE} file not found"; exit 1; }
+
+	OLDIFS=$IFS
+	IFS=$'\t'
+	while read rawFile id title description keywords; do
+
+		echo;
+		e_info "${rawFile}"
+
+		# Skip if file not found
+		[ ! -f "${rawFile}" ] && { echo "File not found, skip."; continue; }
+
+
+		echo "New meta data"
+		echo "ID             : ${id}"
+		echo "title          : ${title}"
+		echo "description    : ${description}"
+		echo "keywords       : ${keywords}"
+
+
+		# Determine current values
+		IMAGE_ID=$(exiftool -s3 -"${META_ID_FIELD}" "${rawFile}")
+		IMAGE_TITLE=$(exiftool -s3 -"${META_TITLE_FIELD}" "${rawFile}")
+		IMAGE_DESCRIPTION=$(exiftool -s3 -"${META_DESCRIPTION_FIELD}" "${rawFile}")
+		IMAGE_KEYWORDS=$(exiftool -s3 -"${META_KEYWORDS_FIELD}" "${rawFile}")
+
+
+		# Split found keywords into array
+		declare -a keywords_array=()
+		OIFS=$IFS
+		IFS=', '
+		for keyword in $IMAGE_KEYWORDS; do keywords_array+=("${keyword}"); done
+		IFS=','
+		for keyword in $keywords; do keywords_array+=("${keyword}"); done
+		IFS=$OIFS
+
+
+		# Set to defaults if we got a blank result
+		NEW_ID="${title:-${IMAGE_ID}}"
+		NEW_TITLE="${title:-${IMAGE_TITLE}}"
+		NEW_DESCRIPTION="${description:-${IMAGE_DESCRIPTION}}"
+		NEW_KEYWORDS=($(echo "${keywords_array[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
+
+
+		# Build output filename
+		ext="${rawFile#*.}"
+		NEW_FILENAME="${title}.${ext}"
+		NEW_FILENAME="${rawFile}"
+
+
+		# Build exiftool CLI parameters
+		declare -a exiftool_params=(
+			-overwrite_original
+			-"${META_ID_FIELD}"="${NEW_ID}"
+			-"${META_TITLE_FIELD}"="${NEW_TITLE}"
+			-"${META_DESCRIPTION_FIELD}"="${NEW_DESCRIPTION}"
+			-"${META_KEYWORDS_FIELD}"="${NEW_KEYWORDS[@]}"
+			# -filename="${NEW_FILENAME}"
+		)
+
+
+		# Update via exiftool
+		echo;
+		echo "Running exiftool:"
+		exiftool "${exiftool_params[@]}" "${rawFile}"
+
+
+		# Display results
+		echo;
+		echo "Meta data now is:"
+		exiftool -f \
+		    -"${META_ID_FIELD}" \
+		    -"${META_TITLE_FIELD}" \
+		    -"${META_DESCRIPTION_FIELD}" \
+		    -"${META_KEYWORDS_FIELD}" \
+		    "${NEW_FILENAME}"
+
+	done < <(tail -n +2 ${CSV_FILE})
+	IFS=$OLDIFS
+
+	echo;
+}
+
+
+# --------------------------------------
+# Business
+# --------------------------------------
+
+
+for item in "${@}"
+do
+	processCsv "${item}"
+done;
