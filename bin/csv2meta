@@ -123,7 +123,7 @@ function updateImage {
 	# Display results
 	echo;
 	echo "Meta data now is:"
-	exiftool -f \
+	exiftool -g1 -f \
 		-"${META_ID_FIELD}" \
 		-"${META_TITLE_FIELD}" \
 		-"${META_DESCRIPTION_FIELD}" \
