@@ -27,13 +27,13 @@ $ csv2meta CSV_FILE
 
 Existing keywords will be preserved. New keywords are added. Doublettes are removed.
 
-| CSV column  | Image ID                   | Meta field        |
-| ----------- | -------------------------- | ----------------- |
-| inputFile   | The image file to write on |                   |
-| id          | Object ID                  | `iptc:ObjectName` |
-| title       | Title                      | `iptc:Headline`   |
-| description | Description                | `mwg:Description` |
-| keywords    | Keywords/tags              | `mwg:Keywords`    |
+| CSV column      | Image ID                   | Meta field        |
+| --------------- | -------------------------- | ----------------- |
+| **inputFile**   | The image file to write on |                   |
+| **id**          | Object ID                  | `iptc:ObjectName` |
+| **title**       | Title                      | `iptc:Headline`   |
+| **description** | Description                | `mwg:Description` |
+| **keywords**    | Keywords/tags              | `mwg:Keywords`    |
 
 ## The CSV file
 
