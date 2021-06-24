@@ -1,4 +1,4 @@
-# cli-csv2meta
+# csv2meta-cli
 
 ## Requirements
 
@@ -13,13 +13,13 @@ $ brew install exiftool
 Clone the repo somewhere:
 
 ```bash
-$ gh repo clone tomkyle/cli-csv2meta
+$ gh repo clone tomkyle/csv2meta-cli
 ```
 
 You may want to add a symlink to your `~/bin` directory:
 
 ```bash
-$ ln -s path/to/cli-csv2meta/bin/csv2meta csv2meta
+$ ln -s path/to/csv2meta-cli/bin/csv2meta csv2meta
 ```
 
 ## Usage
