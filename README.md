@@ -1,12 +1,12 @@
 # csv2meta-cli
 
-**Add individual meta data to a multiple photos using CSV file** 
+**Add individual meta data to multiple photos using CSV file** 
 
 ## Use case
 
-If you just shot a series of different product photos, there's after importing to Lightroom no simple way to add individual meta data to each of them. **csv2meta** script takes a CSV file and assigns individual *title, description,* and *keywords* to each image file – before importing to Lightroom. The only thing you are required to know is, which RAW file shows what.
+If you just shot a series of different product photos, you'll usually import the pictures into Lightroom. Although you can then immediately add meta data for *the whole series,* there's no fast way to add *individual meta data* to each imported photo. That's what **csv2meta** is made for: Before importing to Lightroom, the script assigns individual *title, description,* and *keywords* from a CSV file to each image file. The images can then be imported, together with their indiviudal meta data.
 
-The tool is not meant to add information that have all images in common, like photographer's name and legal hints. It rather helps you with that kind of meta information that can't be assigned as batch.
+The only thing, however, you are required to know is, which RAW file shows what. — The tool is not meant to add information that all images have in common and with which Lightroom excels, like photographer's name and legal hints. **csv2meta** rather helps you with those meta data that cannot be reasonably assigned as batch.
 
 ## Requirements
 
@@ -32,7 +32,9 @@ $ ln -s path/to/csv2meta-cli/bin/csv2meta csv2meta
 
 ## Usage
 
-Dive into your photos directory. Run `csv2meta` with one or many CSV files as parameters.
+Dive into your photos directory. Run `csv2meta` with one or many CSV files as parameters. Make sure you've got an update of your photo files as the script overwrites the original files.
+
+In later versions, the possibility to add *multiple* CSV file parameters may be removed in favour of useful behaviour options.
 
 ```bash
 $ csv2meta CSV_FILE 
@@ -40,7 +42,7 @@ $ csv2meta CSV_FILE
 
 ## Supported Meta tags
 
-Existing keywords will be preserved. New keywords are added. Doublettes are removed.
+Existing keywords will be preserved. New keywords are added (avoiding tag doublettes).
 
 | CSV column      | Image ID                   | Meta field        |
 | --------------- | -------------------------- | ----------------- |
@@ -54,6 +56,8 @@ Existing keywords will be preserved. New keywords are added. Doublettes are remo
 
 **The CSV file must be tab-delimited; strings must not be quoted, hence no linebreaks in strings!** Sorry – I do not know how to handle delimiters dynamically with bash or deal with quoted strings in bash. If someone has a proper idea, please let me know :-)
 
+It is not so important that the column names have exactly the same names as in this example. It rather is the column number with which the script identifies a certain tag value.
+
 **[Example file](./examples/example.csv)** 
 
 | inputFile    | id             | title                 | description                                    | keywords |
@@ -63,7 +67,7 @@ Existing keywords will be preserved. New keywords are added. Doublettes are remo
 
 ## Interesting reads
 
-**Rob Allen, 2019: [Setting title and caption with exiftool](https://akrabat.com/setting-title-and-caption-with-exiftool/)**
+**Rob Allen, 2019: [Setting title and caption with exiftool](https://akrabat.com/setting-title-and-caption-with-exiftool/)** – this article inspired me. Thanks Rob!
 
 **Anthony Morris, 2021: [Obtaining Data From Images Using Exif: How To Automate The Process](https://hackernoon.com/obtaining-data-from-images-using-exif-how-to-automate-the-process-fzr33w3)**
 
