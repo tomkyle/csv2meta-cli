@@ -3,35 +3,41 @@
 
 ## Installation
 
-Clone the repo somewhere. You may want to add a symlink to your `~/bin` directory:
+Clone the repo somewhere:
 
 ```bash
-$ ln -s path/to/csv2meta/bin/csv2meta csv2meta
+$ gh repo clone tomkyle/cli-csv2meta
+```
+
+You may want to add a symlink to your `~/bin` directory:
+
+```bash
+$ ln -s path/to/cli-csv2meta/bin/csv2meta csv2meta
 ```
 
 ## Usage
 
-Dive into your photos directory. Run `csv2meta` one or many CSV files as parameters.
+Dive into your photos directory. Run `csv2meta` with one or many CSV files as parameters.
 
 ```bash
 $ csv2meta CSV_FILE 
 ```
 
-## Meta tags
-
-These meta tags will be written:
-
-Image ID – `iptc:ObjectName`
-Image Title – `iptc:Headline`
-Image Description – `mwg:Description`
-Image keywords/tags – `mwg:Keywords`
+## Supported Meta tags
 
 Existing keywords will be preserved. New keywords are added. Doublettes are removed.
 
+| CSV column  | Image ID                   | Meta field        |
+| ----------- | -------------------------- | ----------------- |
+| inputFile   | The image file to write on |                   |
+| id          | Object ID                  | `iptc:ObjectName` |
+| title       | Title                      | `iptc:Headline`   |
+| description | Description                | `mwg:Description` |
+| keywords    | Keywords/tags              | `mwg:Keywords`    |
+
 ## The CSV file
 
-**The CSV file must be tab-delimited; strings must not be quoted. Sorry.** 
-The author does not know how to handle delimiters dynamically or deal with quoted strings in bash. If someone has a proper idea, please let me know :-)
+**The CSV file must be tab-delimited; strings must not be quoted, hence no linebreaks in strings!** Sorry – I do not know how to handle delimiters dynamically or deal with quoted strings in bash. If someone has a proper idea, please let me know :-)
 
 **[Example file](./examples/example.csv)** 
 
