@@ -1,5 +1,12 @@
 # cli-csv2meta
 
+## Requirements
+
+This bash script requires **Phil Harveys' [ExifTool](https://github.com/exiftool/exiftool).** 
+
+```bash
+$ brew install exiftool
+```
 
 ## Installation
 
@@ -35,19 +42,15 @@ Existing keywords will be preserved. New keywords are added. Doublettes are remo
 | **description** | Description                | `mwg:Description` |
 | **keywords**    | Keywords/tags              | `mwg:Keywords`    |
 
-## The CSV file
+## Meta tags CSV file
 
-**The CSV file must be tab-delimited; strings must not be quoted, hence no linebreaks in strings!** Sorry – I do not know how to handle delimiters dynamically or deal with quoted strings in bash. If someone has a proper idea, please let me know :-)
+**The CSV file must be tab-delimited; strings must not be quoted, hence no linebreaks in strings!** Sorry – I do not know how to handle delimiters dynamically with bash or deal with quoted strings in bash. If someone has a proper idea, please let me know :-)
 
 **[Example file](./examples/example.csv)** 
 
 | inputFile    | id             | title                 | description                                    | keywords |
 | ------------ | -------------- | --------------------- | ---------------------------------------------- | -------- |
 | _DSC5186.NEF | artno_00981223 | Item Title for 981223 | This is an article description for item 981223 | foo,bar  |
-
-
-
----
 
 
 ## Interesting reads
@@ -60,4 +63,3 @@ Existing keywords will be preserved. New keywords are added. Doublettes are remo
 
 **exiv2:** https://exiv2.org/
 
-**ExifTool**: https://github.com/exiftool/exiftool
