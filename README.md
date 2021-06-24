@@ -1,5 +1,13 @@
 # csv2meta-cli
 
+**Add individual meta data to a multiple photos using CSV file** 
+
+## Use case
+
+If you just shot a series of different product photos, there's after importing to Lightroom no simple way to add individual meta data to each of them. **csv2meta** script takes a CSV file and assigns individual *title, description,* and *keywords* to each image file – before importing to Lightroom. The only thing you are required to know is, which RAW file shows what.
+
+The tool is not meant to add information that have all images in common, like photographer's name and legal hints. It rather helps you with that kind of meta information that can't be assigned as batch.
+
 ## Requirements
 
 This bash script requires **Phil Harveys' [ExifTool](https://github.com/exiftool/exiftool).** 
