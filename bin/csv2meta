@@ -18,9 +18,9 @@ set -o pipefail
 # Color codes: https://gist.github.com/vratiu/9780109
 # --------------------------------------
 
-readonly C_BLUE='\033[1;34m'
-readonly C_GRAY='\033[1;30m'
-readonly NC='\033[0m' # No Color
+readonly C_BLUE='\e[1;34m'
+readonly C_GRAY='\e[1;90m'
+readonly NC='\e[0m' # No Color
 
 function e_info {
   echo -e "${C_BLUE}${*}${NC}"
@@ -147,7 +147,7 @@ function main {
 
 	OLDIFS=$IFS
 	IFS=$'\t'
-	while read inputFile id title description keywords;
+	while read -r inputFile id title description keywords;
 	do
 		updateImage "${inputFile}" "${id}" "${title}" "${description}" "${keywords}" || continue
 	done < <(tail -n +2 "${CSV_FILE}")
