@@ -15,13 +15,19 @@ set -o pipefail
 
 # --------------------------------------
 # Output and formatting stuff
+# Color codes: https://gist.github.com/vratiu/9780109
 # --------------------------------------
 
 readonly C_BLUE='\033[1;34m'
+readonly C_GRAY='\033[1;30m'
 readonly NC='\033[0m' # No Color
 
 function e_info {
   echo -e "${C_BLUE}${*}${NC}"
+}
+
+function e_section {
+  echo -e "${C_GRAY}${*}${NC}"
 }
 
 
@@ -31,7 +37,7 @@ function e_info {
 # --------------------------------------
 
 function require  {
-	command -v $1 >/dev/null 2>&1 || exit_err "${1} required but it's not installed";
+	command -v "${1}" >/dev/null 2>&1 || exit_err "${1} required but it's not installed";
 }
 
 # Requirements
@@ -66,7 +72,7 @@ function updateImage {
 
 	echo;
 	e_info "${inputFile}"
-	echo "New meta data"
+	e_section "New meta data"
 	echo "ID             : ${id}"
 	echo "title          : ${title}"
 	echo "description    : ${description}"
@@ -106,23 +112,23 @@ function updateImage {
 	# Build exiftool CLI parameters
 	declare -a exiftool_params=(
 		-overwrite_original
-		-"${META_ID_FIELD}"="${NEW_ID}"
-		-"${META_TITLE_FIELD}"="${NEW_TITLE}"
-		-"${META_DESCRIPTION_FIELD}"="${NEW_DESCRIPTION}"
-		-"${META_KEYWORDS_FIELD}"="${NEW_KEYWORDS[@]}"
+		-"${META_ID_FIELD}=${NEW_ID}"
+		-"${META_TITLE_FIELD}=${NEW_TITLE}"
+		-"${META_DESCRIPTION_FIELD}=${NEW_DESCRIPTION}"
+		-"${META_KEYWORDS_FIELD}=${NEW_KEYWORDS[@]}"
 		# -filename="${OUTPUT_FILE}"
 	)
 
 
 	# Update via exiftool
 	echo;
-	echo "Running exiftool:"
+	e_section "Running exiftool:"
 	exiftool "${exiftool_params[@]}" "${inputFile}"
 
 
 	# Display results
 	echo;
-	echo "Meta data now is:"
+	e_section "Meta data now is:"
 	exiftool -g1 -f \
 		-"${META_ID_FIELD}" \
 		-"${META_TITLE_FIELD}" \
@@ -137,14 +143,14 @@ function main {
 
 	CSV_FILE="${1}"
 
-	[ ! -f $CSV_FILE ] && { echo "${CSV_FILE} file not found"; exit 1; }
+	[ ! -f "${CSV_FILE}" ] && { echo "${CSV_FILE} file not found"; exit 1; }
 
 	OLDIFS=$IFS
 	IFS=$'\t'
 	while read inputFile id title description keywords;
 	do
 		updateImage "${inputFile}" "${id}" "${title}" "${description}" "${keywords}" || continue
-	done < <(tail -n +2 ${CSV_FILE})
+	done < <(tail -n +2 "${CSV_FILE}")
 	IFS=$OLDIFS
 }
 
