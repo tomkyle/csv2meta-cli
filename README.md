@@ -4,7 +4,7 @@
 
 ## Use case
 
-If you just shot a series of different product photos, you'll usually import the pictures into Lightroom. Although you can then immediately add meta data for *the whole series,* there's no fast way to add *individual meta data* to each imported photo. That's what **csv2meta** is made for: Before importing to Lightroom, the script assigns individual *title, description,* and *keywords* from a CSV file to each image file. The images can then be imported, together with their indiviudal meta data.
+If you just shot a series of different product photos, you'll usually import the pictures into Lightroom. Although you can then immediately add meta data for *the whole series,* there's no fast way to add *individual meta data* to each imported photo. That's what **csv2meta** is made for: Before importing to Lightroom, the script assigns individual *title, description,* and *keywords* from a CSV file to each image file. The images can then be imported, together with their individual meta data.
 
 The only thing, however, you are required to know is, which RAW file shows what. — The tool is not meant to add information that all images have in common and with which Lightroom excels, like photographer's name and legal hints. **csv2meta** rather helps you with those meta data that cannot be reasonably assigned as batch.
 
@@ -18,15 +18,10 @@ $ brew install exiftool
 
 ## Installation
 
-Clone the repo somewhere:
+Clone the repo somewhere. You may want to add a symlink to your `~/bin` directory.
 
 ```bash
 $ gh repo clone tomkyle/csv2meta-cli
-```
-
-You may want to add a symlink to your `~/bin` directory:
-
-```bash
 $ ln -s path/to/csv2meta-cli/bin/csv2meta csv2meta
 ```
 
