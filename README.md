@@ -66,7 +66,7 @@ Existing keywords will be preserved. New keywords are added (avoiding tag double
 
 **The CSV file must be tab-delimited; strings must not be quoted, hence no linebreaks in strings!** Sorry – I do not know how to handle delimiters dynamically with bash or deal with quoted strings in bash. If someone has a proper idea, please let me know :-)
 
-It is not so important that the column names have exactly the same names as in this example. It rather is the column number with which the script identifies a certain tag value.
+It is not so important that the column names have exactly the same names as in this example. It rather is the *column number/order* with which the script identifies a certain tag value.
 
 **[Example file](./examples/example.csv)** 
 
