@@ -27,7 +27,7 @@ $ ln -s path/to/csv2meta-cli/bin/csv2meta csv2meta
 
 ## Usage
 
-Dive into your photos directory. Run `csv2meta` with one or many CSV files as parameters. Make sure you've got an update of your photo files as the script overwrites the original files.
+Dive into your photos directory. Run `csv2meta` with one or many CSV files as parameters. Make sure you've got an update of your photo files as the script (in this early version) overwrites the original files.
 
 In later versions, the possibility to add *multiple* CSV file parameters may be removed in favour of useful behaviour options.
 
