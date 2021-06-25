@@ -32,8 +32,23 @@ Dive into your photos directory. Run `csv2meta` with one or many CSV files as pa
 In later versions, the possibility to add *multiple* CSV file parameters may be removed in favour of useful behaviour options.
 
 ```bash
-$ csv2meta CSV_FILE 
+$ csv2meta [OPTIONS] CSV_FILE 
 ```
+
+## Options
+
+| Option            | Description                                                  |
+| ----------------- | ------------------------------------------------------------ |
+| **-f, --force**   | Overwrite original file. The input files will not be copied to `*_original.ext`. |
+| **-v, --verbous** | Turn on verbose output.                                      |
+
+### Overwrite original files
+
+By default, the script uses *ExifTool's* functionality to create a backup from the input file. The backup file will be suffixed with `_original` . Pass `--force` or `-f` to instead overwrite the input files.
+
+### Verbosity
+
+Pass `--verbous` or `-v` to add some helpful output.
 
 ## Supported Meta tags
 

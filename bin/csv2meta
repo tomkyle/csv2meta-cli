@@ -47,8 +47,19 @@ require exiftool
 
 
 # --------------------------------------
+# Configuration
+# --------------------------------------
+
+# Turn on verbous output
+declare -i overwrite_original=0
+declare -i verbous_output=0
+
+
+# --------------------------------------
 # Settings
 # --------------------------------------
+
+CSV_DELIMITER=$'\t'
 
 META_ID_FIELD="iptc:ObjectName"
 META_TITLE_FIELD="iptc:Headline"
@@ -56,9 +67,156 @@ META_DESCRIPTION_FIELD="mwg:Description"
 META_KEYWORDS_FIELD="mwg:Keywords"
 
 
+
+# ======================================
+#  Options parsing
+# ======================================
+
 # --------------------------------------
-# Functions
+# _require_argument()
+#
+# Usage:
+#   _require_argument <option> <argument>
+#
+# If <argument> is blank or another option, print an error message
+#
+# This function is stolen from William Melody's bash-boilerplate
+# <https://github.com/alphabetum/bash-boilerplate>
 # --------------------------------------
+
+_require_argument() {
+    # Set local variables from arguments.
+    #
+    # NOTE: 'local' is a non-POSIX bash feature and keeps the variable local to
+    # the block of code, as defined by curly braces. It's easiest to just think
+    # of them as local to a function.
+    local _option="${1:-}"
+    local _argument="${2:-}"
+
+    if [[ -z "${_argument}" ]] || [[ "${_argument}" =~ ^- ]]
+    then
+        e_error "$(printf "Option requires a argument: %s\n" "${_option}")"
+    fi
+}
+
+
+# ---------------------------------------
+# Normalize options
+#
+# This section is stolen from William Melody's bash-boilerplate
+# <https://github.com/alphabetum/bash-boilerplate>
+# ---------------------------------------
+
+# iterate over options, breaking -ab into -a -b and --foo=bar into --foo bar
+# also turns -- into --endopts to avoid issues with things like '-o-', the '-'
+# should not indicate the end of options, but be an invalid option (or the
+# argument to the option, such as wget -qO-)
+unset options
+# while the number of arguments is greater than 0
+while ((${#}))
+do
+  case ${1} in
+    # if option is of type -ab
+    -[!-]?*)
+      # loop over each character starting with the second
+      for ((i=1; i<${#1}; i++))
+      do
+        # extract 1 character from position 'i'
+        c=${1:i:1}
+        # add current char to options
+        options+=("-${c}")
+
+        # if option takes a required argument, and it's not the last char
+        # make the rest of the string its argument
+        if [[ ${OPTIONS_LIST} = *"${c}:"* && ${1:i+1} ]]
+        then
+          options+=("${1:i+1}")
+          break
+        fi
+      done
+      ;;
+    # if option is of type --foo=bar, split on first '='
+    --?*=*)
+      options+=("${1%%=*}" "${1#*=}")
+      ;;
+    # end of options, stop breaking them up
+    --)
+      options+=(--endopts)
+      shift
+      options+=("${@}")
+      break
+      ;;
+    # otherwise, nothing special
+    *)
+      options+=("${1}")
+      ;;
+  esac
+
+  shift
+done
+
+# set new positional parameters to altered options. Set default to blank.
+set -- "${options[@]:-}"
+unset options
+
+
+
+
+# ---------------------------------------
+# Parse Options
+# ---------------------------------------
+
+# getopts and getopts have inconsistent behavior, so using a simple home-brewed
+# while loop. This isn't perfectly compliant with POSIX, but it's close enough
+# and this appears to be a widely used approach.
+#
+# More info:
+#   http://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html
+#   http://stackoverflow.com/a/14203146
+#   http://stackoverflow.com/a/7948533
+#
+# This section is stolen from William Melody's bash-boilerplate
+# <https://github.com/alphabetum/bash-boilerplate>
+while [ ${#} -gt 0 ]
+do
+    __option="${1:-}"
+    __maybe_param="${2:-}"
+
+    case "${__option}" in
+        # For a later release...
+
+        -f|--force)
+             overwrite_original=1
+             ;;
+
+        -v|--verbous|--verbose)
+             verbous_output=1
+             ;;
+
+        --endopts)
+            # Terminate option parsing.
+            break
+            ;;
+        -*)
+            # Assume option because of leading "-"
+            e_error "$(printf "Unexpected option: %s\n" "${__option}")"
+            ;;
+        *)
+            # "Anything else must be a CSV file parameter"
+            # This is a WORKAROUND, as without this "*)" block any given image parameters
+            # after the arguments seem to get lost (i.e., stuck in last $__option checked).
+            csv_files_array+=("${__option}")
+            ;;
+    esac
+    shift
+
+done
+
+
+
+# ======================================
+#  Functions
+# ======================================
 
 function updateImage {
 
@@ -107,11 +265,17 @@ function updateImage {
 	OUTPUT_FILE="${NEW_ID}.${inputFile#*.}"
 	OUTPUT_FILE="${inputFile}"
 
-
-
 	# Build exiftool CLI parameters
-	declare -a exiftool_params=(
-		-overwrite_original
+	declare -a exiftool_params=()
+
+	if  [ $overwrite_original -gt 0 ]; then
+		exiftool_params+=(-overwrite_original)
+		if  [ $verbous_output -gt 0 ]; then
+			echo "Will overwrite original files"
+		fi
+	fi
+
+	exiftool_params+=(
 		-"${META_ID_FIELD}=${NEW_ID}"
 		-"${META_TITLE_FIELD}=${NEW_TITLE}"
 		-"${META_DESCRIPTION_FIELD}=${NEW_DESCRIPTION}"
@@ -123,19 +287,24 @@ function updateImage {
 	# Update via exiftool
 	echo;
 	e_section "Running exiftool:"
+	if  [ $overwrite_original -gt 0 ] && [ $verbous_output -gt 0 ]; then
+		echo "(will overwrite original files)"
+	fi
+
 	exiftool "${exiftool_params[@]}" "${inputFile}"
 
 
 	# Display results
-	echo;
-	e_section "Meta data now is:"
-	exiftool -g1 -f \
-		-"${META_ID_FIELD}" \
-		-"${META_TITLE_FIELD}" \
-		-"${META_DESCRIPTION_FIELD}" \
-		-"${META_KEYWORDS_FIELD}" \
-		"${OUTPUT_FILE}"
-
+	if  [ $verbous_output -gt 0 ]; then
+		echo;
+		e_section "Meta data now is:"
+		exiftool -g1 -f \
+			-"${META_ID_FIELD}" \
+			-"${META_TITLE_FIELD}" \
+			-"${META_DESCRIPTION_FIELD}" \
+			-"${META_KEYWORDS_FIELD}" \
+			"${OUTPUT_FILE}"
+	fi
 }
 
 
@@ -146,21 +315,26 @@ function main {
 	[ ! -f "${CSV_FILE}" ] && { echo "${CSV_FILE} file not found"; exit 1; }
 
 	OLDIFS=$IFS
-	IFS=$'\t'
+	IFS=$CSV_DELIMITER
 	while read -r inputFile id title description keywords;
 	do
-		updateImage "${inputFile}" "${id}" "${title}" "${description}" "${keywords}" || continue
+		updateImage \
+			"${inputFile}" \
+			"${id}" \
+			"${title}" \
+			"${description}" \
+			"${keywords}" || continue
 	done < <(tail -n +2 "${CSV_FILE}")
 	IFS=$OLDIFS
 }
 
 
-# --------------------------------------
+# ======================================
 # Business
-# --------------------------------------
+# ======================================
 
 
-for csvFile in "${@}"
+for csvFile in "${csv_files_array[@]}"
 do
 	main "${csvFile}"
 done;
