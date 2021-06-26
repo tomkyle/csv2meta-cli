@@ -7,10 +7,12 @@
 # Runtime Environment
 # ---------------------------------------
 
-set -o errexit
-set -o nounset
+set -o errexit  # -e
+set -o nounset  # -u
+set -o errtrace  # -E
+# set -o xtrace # -x
 set -o pipefail
-# set -o xtrace
+
 
 
 # --------------------------------------
@@ -18,7 +20,9 @@ set -o pipefail
 # Color codes: https://gist.github.com/vratiu/9780109
 # --------------------------------------
 
+readonly C_RED='\e[1;31m'
 readonly C_BLUE='\e[1;34m'
+readonly C_GREEN='\e[1;32m'
 readonly C_GRAY='\e[1;90m'
 readonly NC='\e[0m' # No Color
 
@@ -27,9 +31,20 @@ function e_info {
 }
 
 function e_section {
-  echo -e "${C_GRAY}${*}${NC}"
+  [ $verbous_output -gt 0 ] && echo;
+  echo -e "${C_GRAY}● ${*}${NC}"
 }
 
+function e_success () {
+	echo -e "${C_GREEN}● Success:${NC} ${*-}"
+}
+
+function e_error {
+	[ $verbous_output -gt 0 ] && echo;
+	# Error message and error exit, redirecting stdout to stderr
+	echo -e >&2 "${C_RED}● Error:${NC} ${*-}";
+	exit 1;
+}
 
 
 # --------------------------------------
@@ -37,7 +52,7 @@ function e_section {
 # --------------------------------------
 
 function require  {
-	command -v "${1}" >/dev/null 2>&1 || exit_err "${1} required but it's not installed";
+	command -v "${1}" >/dev/null 2>&1 || e_error "$(printf "Program '%s' required, but it's not installed" "${1}")"
 }
 
 # Requirements
@@ -61,10 +76,14 @@ declare -i verbous_output=0
 
 CSV_DELIMITER=$'\t'
 
-META_ID_FIELD="iptc:ObjectName"
-META_TITLE_FIELD="iptc:Headline"
-META_DESCRIPTION_FIELD="mwg:Description"
-META_KEYWORDS_FIELD="mwg:Keywords"
+# META_ID_FIELD="iptc:ObjectName"
+META_ID_FIELD="Title"
+# META_TITLE_FIELD="iptc:Headline"
+META_TITLE_FIELD="Headline"
+# META_DESCRIPTION_FIELD="mwg:Description"
+META_DESCRIPTION_FIELD="Description"
+# META_KEYWORDS_FIELD="mwg:Keywords"
+META_KEYWORDS_FIELD="Keywords"
 
 
 
@@ -230,11 +249,14 @@ function updateImage {
 
 	echo;
 	e_info "${inputFile}"
-	e_section "New meta data"
-	echo "ID             : ${id}"
-	echo "title          : ${title}"
-	echo "description    : ${description}"
-	echo "keywords       : ${keywords}"
+
+	if  [ $verbous_output -gt 0 ]; then
+		e_section "New meta data"
+		echo "ID             : ${id}"
+		echo "title          : ${title}"
+		echo "description    : ${description}"
+		echo "keywords       : ${keywords}"
+	fi
 
 
 	# Determine current values
@@ -255,7 +277,7 @@ function updateImage {
 
 
 	# Set to defaults if we got a blank result
-	NEW_ID="${title:-${IMAGE_ID}}"
+	NEW_ID="${id:-${IMAGE_ID}}"
 	NEW_TITLE="${title:-${IMAGE_TITLE}}"
 	NEW_DESCRIPTION="${description:-${IMAGE_DESCRIPTION}}"
 	NEW_KEYWORDS=($(echo "${keywords_array[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
@@ -276,6 +298,7 @@ function updateImage {
 	fi
 
 	exiftool_params+=(
+		-q
 		-"${META_ID_FIELD}=${NEW_ID}"
 		-"${META_TITLE_FIELD}=${NEW_TITLE}"
 		-"${META_DESCRIPTION_FIELD}=${NEW_DESCRIPTION}"
@@ -285,8 +308,7 @@ function updateImage {
 
 
 	# Update via exiftool
-	echo;
-	e_section "Running exiftool:"
+	e_section "Running exiftool"
 	if  [ $overwrite_original -gt 0 ] && [ $verbous_output -gt 0 ]; then
 		echo "(will overwrite original files)"
 	fi
@@ -296,7 +318,6 @@ function updateImage {
 
 	# Display results
 	if  [ $verbous_output -gt 0 ]; then
-		echo;
 		e_section "Meta data now is:"
 		exiftool -g1 -f \
 			-"${META_ID_FIELD}" \
@@ -305,6 +326,9 @@ function updateImage {
 			-"${META_KEYWORDS_FIELD}" \
 			"${OUTPUT_FILE}"
 	fi
+
+	[ $verbous_output -gt 0 ] && echo;
+	e_success "${inputFile}"
 }
 
 
