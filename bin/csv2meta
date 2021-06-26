@@ -9,6 +9,7 @@
 
 set -o errexit  # -e
 set -o nounset  # -u
+set -o errtrace  # -E
 # set -o xtrace # -x
 set -o pipefail
 
