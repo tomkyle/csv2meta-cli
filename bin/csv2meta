@@ -40,6 +40,7 @@ function e_success () {
 }
 
 function e_error {
+	[ $verbous_output -gt 0 ] && echo;
 	# Error message and error exit, redirecting stdout to stderr
 	echo -e >&2 "${C_RED}● Error:${NC} ${*-}";
 	exit 1;
@@ -75,11 +76,14 @@ declare -i verbous_output=0
 
 CSV_DELIMITER=$'\t'
 
-META_ID_FIELD="iptc:ObjectName"
-# META_ID_FIELD="ImageUniqueID"
-META_TITLE_FIELD="iptc:Headline"            # iptc:ObjectName
-META_DESCRIPTION_FIELD="mwg:Description"    # iptc:Caption-Abstract
-META_KEYWORDS_FIELD="mwg:Keywords"          # iptc:Keywords
+# META_ID_FIELD="iptc:ObjectName"
+META_ID_FIELD="Title"
+# META_TITLE_FIELD="iptc:Headline"
+META_TITLE_FIELD="Headline"
+# META_DESCRIPTION_FIELD="mwg:Description"
+META_DESCRIPTION_FIELD="Description"
+# META_KEYWORDS_FIELD="mwg:Keywords"
+META_KEYWORDS_FIELD="Keywords"
 
 
 

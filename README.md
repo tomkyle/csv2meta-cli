@@ -53,14 +53,15 @@ Pass `--verbous` or `-v` to add some helpful output.
 ## Supported Meta tags
 
 Existing keywords will be preserved. New keywords are added (avoiding tag doublettes).
+**N.B.** that *title* and *headline* have different meanings.
 
-| CSV column      | Image ID                   | Meta field        |
-| --------------- | -------------------------- | ----------------- |
-| **inputFile**   | The image file to write on |                   |
-| **id**          | Object ID                  | `iptc:ObjectName` |
-| **title**       | Title                      | `iptc:Headline`   |
-| **description** | Description                | `mwg:Description` |
-| **keywords**    | Keywords/tags              | `mwg:Keywords`    |
+| CSV column      | Image ID                   | exiftool tag name … | … aims at meta field |
+| --------------- | -------------------------- | ------------------- | -------------------- |
+| **inputFile**   | The image file to write on |                     |                      |
+| **id**          | Object ID                  | `title`             | `iptc:ObjectName`    |
+| **title**       | Title                      | `headline`          | `iptc:Headline`      |
+| **description** | Description                | `description`       | `mwg:Description`    |
+| **keywords**    | Keywords/tags              | `keywords`          | `mwg:Keywords`       |
 
 ## Meta tags CSV file
 
