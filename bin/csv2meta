@@ -7,10 +7,11 @@
 # Runtime Environment
 # ---------------------------------------
 
-set -o errexit
-set -o nounset
+set -o errexit  # -e
+set -o nounset  # -u
+# set -o xtrace # -x
 set -o pipefail
-# set -o xtrace
+
 
 
 # --------------------------------------
