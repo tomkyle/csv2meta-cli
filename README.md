@@ -53,15 +53,14 @@ Pass `--verbous` or `-v` to add some helpful output.
 ## Supported Meta tags
 
 Existing keywords will be preserved. New keywords are added (avoiding tag doublettes).
-**N.B.** that *title* and *headline* have different meanings.
 
-| CSV column      | Image ID                   | exiftool tag name … | … aims at meta field |
-| --------------- | -------------------------- | ------------------- | -------------------- |
-| **inputFile**   | The image file to write on |                     |                      |
-| **id**          | Object ID                  | `title`             | `iptc:ObjectName`    |
-| **title**       | Title                      | `headline`          | `iptc:Headline`      |
-| **description** | Description                | `description`       | `mwg:Description`    |
-| **keywords**    | Keywords/tags              | `keywords`          | `mwg:Keywords`       |
+| CSV column      | Image ID                   | Meta field        |
+| --------------- | -------------------------- | ----------------- |
+| **inputFile**   | The image file to write on |                   |
+| **id**          | Object ID                  | `iptc:ObjectName` |
+| **title**       | Title                      | `iptc:Headline`   |
+| **description** | Description                | `mwg:Description` |
+| **keywords**    | Keywords/tags              | `mwg:Keywords`    |
 
 ## Meta tags CSV file
 
@@ -75,8 +74,9 @@ It is not so important that the column names have exactly the same names as in t
 | ------------ | -------------- | --------------------- | ---------------------------------------------- | -------- |
 | _DSC5186.NEF | artno_00981223 | Item Title for 981223 | This is an article description for item 981223 | foo,bar  |
 
-
 ## Interesting reads
+
+**IPTC Photo Metadata Standard, 2019: [Example file and specs](https://iptc.org/standards/photo-metadata/iptc-standard/)**
 
 **Rob Allen, 2019: [Setting title and caption with exiftool](https://akrabat.com/setting-title-and-caption-with-exiftool/)** – this article inspired me. Thanks Rob!
 

@@ -259,35 +259,36 @@ function updateImage {
 	fi
 
 
-	# Determine current values
+	### Determine current values
 	IMAGE_ID=$(exiftool -s3 -"${META_ID_FIELD}" "${inputFile}")
 	IMAGE_TITLE=$(exiftool -s3 -"${META_TITLE_FIELD}" "${inputFile}")
 	IMAGE_DESCRIPTION=$(exiftool -s3 -"${META_DESCRIPTION_FIELD}" "${inputFile}")
 	IMAGE_KEYWORDS=$(exiftool -s3 -"${META_KEYWORDS_FIELD}" "${inputFile}")
 
 
-	# Split found keywords into array
+	### Split found keywords into array
 	declare -a keywords_array=()
 	OIFS=$IFS
-	IFS=', '
-	for keyword in $IMAGE_KEYWORDS; do keywords_array+=("${keyword}"); done
-	IFS=','
-	for keyword in $keywords; do keywords_array+=("${keyword}"); done
+	IFS=', '; for keyword in $IMAGE_KEYWORDS; do keywords_array+=("${keyword}"); done
+	IFS=',';  for keyword in $keywords; do keywords_array+=("${keyword}"); done
 	IFS=$OIFS
 
-
-	# Set to defaults if we got a blank result
+	### Set to defaults if we got a blank result
 	NEW_ID="${id:-${IMAGE_ID}}"
 	NEW_TITLE="${title:-${IMAGE_TITLE}}"
 	NEW_DESCRIPTION="${description:-${IMAGE_DESCRIPTION}}"
-	NEW_KEYWORDS=($(echo "${keywords_array[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
 
+	### Make keywords unique array values
+	NEW_KEYWORDS_STR=($(echo "${keywords_array[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
+	OIFS=$IFS
+	IFS=' ' read -r -a NEW_KEYWORDS_ARR <<< "${NEW_KEYWORDS_STR}"
+	IFS=$OIFS
 
-	# Build output filename
-	OUTPUT_FILE="${NEW_ID}.${inputFile#*.}"
+	### Build output filename
+	# OUTPUT_FILE="${NEW_ID}.${inputFile#*.}"
 	OUTPUT_FILE="${inputFile}"
 
-	# Build exiftool CLI parameters
+	### Build exiftool CLI parameters
 	declare -a exiftool_params=()
 
 	if  [ $overwrite_original -gt 0 ]; then
@@ -302,12 +303,16 @@ function updateImage {
 		-"${META_ID_FIELD}=${NEW_ID}"
 		-"${META_TITLE_FIELD}=${NEW_TITLE}"
 		-"${META_DESCRIPTION_FIELD}=${NEW_DESCRIPTION}"
-		-"${META_KEYWORDS_FIELD}=${NEW_KEYWORDS[@]}"
-		# -filename="${OUTPUT_FILE}"
 	)
 
+	for keyword in "${NEW_KEYWORDS_ARR[@]}"; do
+		exiftool_params+=(
+			-"${META_KEYWORDS_FIELD}=${keyword}"
+		)
+	done
 
-	# Update via exiftool
+
+	### Update via exiftool
 	e_section "Running exiftool"
 	if  [ $overwrite_original -gt 0 ] && [ $verbous_output -gt 0 ]; then
 		echo "(will overwrite original files)"
@@ -316,7 +321,7 @@ function updateImage {
 	exiftool "${exiftool_params[@]}" "${inputFile}"
 
 
-	# Display results
+	### Display results
 	if  [ $verbous_output -gt 0 ]; then
 		e_section "Meta data now is:"
 		exiftool -g1 -f \
