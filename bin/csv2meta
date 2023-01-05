@@ -245,6 +245,7 @@ function updateImage {
 	description="${4}"
 	keywords="${5}"
 
+
 	[ ! -f "${inputFile}" ] && { echo "File not found: ${inputFile}"; return 1; }
 
 	echo;
@@ -365,5 +366,6 @@ function main {
 
 for csvFile in "${csv_files_array[@]}"
 do
+	[ -z "${csvFile}" ] && { echo "No CSV file given."; exit 1; }
 	main "${csvFile}"
 done;
